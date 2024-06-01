@@ -16,8 +16,8 @@ jobs:
       - name: Build and Release
         run: |
           docker build -t ${{secrets.DOCKERHUB_REPO}} .
-          docker tag ${{secrets.DOCKERHUB_REPO}}:latest ${{secrets.DOCKERHUB_REPO}}:latest
-          docker push ${{secrets.DOCKERHUB_REPO}}:latest
+          docker tag ${{secrets.DOCKERHUB_REPO}}:latest ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKERHUB_REPO}}:latest
+          docker push ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKERHUB_REPO}}:latest
       - name: Deploy to server
         uses: appleboy/ssh-action@master
         id: deploy
@@ -27,6 +27,6 @@ jobs:
           key: ${{ secrets.KEY }} # pem키
           script: |
             sudo docker rm -f $(docker ps -aqf "name=^${{secrets.DOCKERHUB_REPO}}")
-            sudo docker pull ${{secrets.DOCKERHUB_REPO}}:latest
-            sudo docker run -d -p 80:80 --name ${{secrets.DOCKERHUB_REPO}} ${{secrets.DOCKERHUB_REPO}}:latest
+            sudo docker pull ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKERHUB_REPO}}:latest
+            sudo docker run -d -p 80:80 --name ${{secrets.DOCKERHUB_REPO}} ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKERHUB_REPO}}:latest
             sudo docker image prune -f
